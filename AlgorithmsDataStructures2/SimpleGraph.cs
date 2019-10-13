@@ -89,6 +89,7 @@ namespace AlgorithmsDataStructures2
 
         public List<Vertex<T>> BreadthFirstSearch(int VFrom, int VTo)
         {
+            ClearQueueData();
             return TracesToList(NextQueueVert(LeaveVertexTrace(VFrom), VTo));
         }
 
@@ -127,6 +128,17 @@ namespace AlgorithmsDataStructures2
         private void ClearStackData()
         {
             stack = new Stack<Vertex<T>>();
+            UnhitVertex();
+        }
+
+        private void ClearQueueData()
+        {
+            queue = new Queue<Trace<Vertex<T>>>();
+            UnhitVertex();
+        }
+
+        private void UnhitVertex()
+        {
             for (int i = 0; i < max_vertex; i++) vertex[i].Hit = false;
         }
 

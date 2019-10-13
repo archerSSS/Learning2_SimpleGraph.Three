@@ -137,6 +137,24 @@ namespace AlgoTest_1
             Assert.AreEqual(0, list.Count);
         }
 
+        [TestMethod]
+        public void TestDoubleBreadthA_1()
+        {
+            SimpleGraph<int> graph = GetGraphB();
+            List<Vertex<int>> list = graph.BreadthFirstSearch(2, 5);
+            List<Vertex<int>> list2 = graph.BreadthFirstSearch(3, 8);
+            List<Vertex<int>> list3 = graph.BreadthFirstSearch(1, 5);
+            int[] array = new int[] { 2, 0, 4, 5 };
+            int[] array3 = new int[] { 1, 9, 5 };
+
+            int index = 0;
+            foreach (Vertex<int> vert in list) Assert.AreEqual(array[index++], vert.Value);
+
+            Assert.AreEqual(0, list2.Count);
+
+            index = 0;
+            foreach (Vertex<int> vert in list3) Assert.AreEqual(array3[index++], vert.Value);
+        }
 
 
         /*
