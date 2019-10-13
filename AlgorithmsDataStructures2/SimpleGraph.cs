@@ -392,16 +392,6 @@ namespace AlgorithmsDataStructures2
     }
 
     
-
-    public class Tracer<T>
-    {
-        public Trace<T> lastStep;
-
-        public Tracer()
-        {
-        }
-    }
-
     public class Trace<T>
     {
         public int num;
