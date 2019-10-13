@@ -89,18 +89,7 @@ namespace AlgorithmsDataStructures2
 
         public List<Vertex<T>> BreadthFirstSearch(int VFrom, int VTo)
         {
-            // узлы задаются позициями в списке vertex.
-            // возвращает список узлов -- путь из VFrom в VTo
-            // или пустой список, если пути нету
-            List<Vertex<T>> list = new List<Vertex<T>>();
-            Tracer<Vertex<T>> tracer = new Tracer<Vertex<T>>();
-            if (vertex[VFrom] != null)
-            {
-                vertex[VFrom].Hit = true;
-                tracer.lastStep = NextQueueVert(new Trace<Vertex<T>>(VFrom), VTo);
-            }
-            list = TracesToList(tracer.lastStep);
-            return list;
+            return TracesToList(NextQueueVert(LeaveVertexTrace(VFrom), VTo));
         }
 
         private bool IsInRange(int v)
@@ -111,6 +100,28 @@ namespace AlgorithmsDataStructures2
         private bool IsInRange(int a, int b)
         {
             return a < max_vertex && b < max_vertex;
+        }
+
+        private bool HitVertex(Vertex<T> vertex)
+        {
+            return vertex.Hit = true;
+        }
+
+        private bool IsNotEmpty(int index)
+        {
+            return index < max_vertex && vertex[index] != null;
+        }
+
+        private Vertex<T> GetVertex(int index)
+        {
+            if (IsNotEmpty(index)) return vertex[index];
+            return null;
+        }
+
+        private Trace<Vertex<T>> LeaveVertexTrace(int index)
+        {
+            if (IsNotEmpty(index)) return new Trace<Vertex<T>>(index);
+            return null;
         }
 
         private void ClearStackData()
