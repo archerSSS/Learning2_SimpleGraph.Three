@@ -16,7 +16,7 @@ namespace AlgorithmsDataStructures2
 
     public class SimpleGraph<T>
     {
-        public Queue<int> queue;
+        public Queue<Trace<Vertex<T>>> queue;
         public Stack<Vertex<T>> stack;
         public Vertex<T>[] vertex;
         public int[,] m_adjacency;
@@ -27,7 +27,7 @@ namespace AlgorithmsDataStructures2
             max_vertex = size;
             m_adjacency = new int[size, size];
             vertex = new Vertex<T>[size];
-            queue = new Queue<int>();
+            queue = new Queue<Trace<Vertex<T>>>();
             stack = new Stack<Vertex<T>>();
         }
 
@@ -92,9 +92,14 @@ namespace AlgorithmsDataStructures2
             // узлы задаются позициями в списке vertex.
             // возвращает список узлов -- путь из VFrom в VTo
             // или пустой список, если пути нету
-            Scout<int> scout = new Scout<int>();
             List<Vertex<T>> list = new List<Vertex<T>>();
-            if (vertex[VFrom] != null) NextQueueVert(scout.step, VFrom, VTo);
+            Tracer<Vertex<T>> tracer = new Tracer<Vertex<T>>();
+            if (vertex[VFrom] != null)
+            {
+                vertex[VFrom].Hit = true;
+                tracer.lastStep = NextQueueVert(new Trace<Vertex<T>>(VFrom), VTo);
+            }
+            list = TracesToList(tracer.lastStep);
             return list;
         }
 
@@ -168,24 +173,42 @@ namespace AlgorithmsDataStructures2
             return i >= max_vertex;
         }
 
-        private bool NextQueueVert(BitStep<int> step, int VPres, int VTo)
+        private Trace<Vertex<T>> NextQueueVert(Trace<Vertex<T>> step, int VTo)
         {
-            step.nextep = new BitStep<int>(VPres);
-            if (VPres == -1) return false;
+            if (step == null) return null; 
             for (int i = 0; i < max_vertex; i++)
-            {
-                if (vertex[i] != null && !vertex[i].Hit && IsEdge(VPres, VTo))
+                if (vertex[i] != null && !vertex[i].Hit && IsEdge(step.num, i))
                 {
-                    if (i == VTo)
-                    {
-                        step.value = i;
-                        return true;
-                    }
+                    if (i == VTo) return step.SetNextTrace(step, i);
                     vertex[i].Hit = true;
-                    queue.Enqueue(i);
+                    queue.Enqueue(step.SetNextTrace(step, i));
+                }
+            return NextQueueVert(queue.Dequeue(), VTo);
+        }
+
+        private Trace<Vertex<T>> ThrowCroubs(Trace<Vertex<T>> trace)
+        {
+            while (trace.steprev != null)
+            {
+                trace.steprev.nextep = trace;
+                trace = trace.steprev;
+            }
+            return trace;
+        }
+        
+        private List<Vertex<T>> TracesToList(Trace<Vertex<T>> trace)
+        {
+            List<Vertex<T>> list = new List<Vertex<T>>();
+            if (trace != null)
+            {
+                trace = ThrowCroubs(trace);
+                while (trace != null)
+                {
+                    list.Add(vertex[trace.num]);
+                    trace = trace.nextep;
                 }
             }
-            return NextQueueVert(step.nextep, queue.Dequeue(), VTo);
+            return list;
         }
     }
 
@@ -357,23 +380,33 @@ namespace AlgorithmsDataStructures2
         }
     }
 
-    public class Scout<T>
-    {
-        public BitStep<T> step;
+    
 
-        public Scout()
+    public class Tracer<T>
+    {
+        public Trace<T> lastStep;
+
+        public Tracer()
         {
         }
     }
 
-    public class BitStep<T>
+    public class Trace<T>
     {
-        public T value;
-        public BitStep<T> nextep;
+        public int num;
+        public Trace<T> nextep;
+        public Trace<T> steprev;
 
-        public BitStep(T val)
+        public Trace(int n)
         {
-            value = val;
+            num = n;
+        }
+        
+        public Trace<T> SetNextTrace(Trace<T> step, int n)
+        {
+            Trace<T> nextep = new Trace<T>(n);
+            nextep.steprev = step;
+            return nextep;
         }
     }
 }
